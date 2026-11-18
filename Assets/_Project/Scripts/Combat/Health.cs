@@ -15,6 +15,11 @@ public class Health : MonoBehaviour
     public float Max => maxHealth;
     public bool IsDead => Current <= 0f;
 
+    [SerializeField] bool isPlayer = false;
+
+    public static Health playerHealth; //che cos'è una variabile statica? una rappresentazione univoca di quell'istanza nella variabile
+                                        //(se fosse multiplayer si fa un check di non so cosa)
+                                        
     /// <summary>Invocato a ogni variazione: (vita attuale, vita massima).</summary>
     public event Action<float, float> HealthChanged;
 
@@ -24,14 +29,21 @@ public class Health : MonoBehaviour
     private void Awake()
     {
         Current = maxHealth;
+
+        if(isPlayer)
+        {
+            playerHealth = this;   
+        }
     }
 
     public void TakeDamage(float amount)
     {
         if (IsDead || amount <= 0f) return;
 
-        Current = Mathf.Max(0f, Current - amount);
-        HealthChanged?.Invoke(Current, maxHealth);
+        Current = Mathf.Max(0f, Current - amount);    
+        HealthChanged?.Invoke(Current, maxHealth);  // ? significa semmai qualcosa o niente e fra parentesi ciò che voglio che faccia
+
+        Debug.Log($"object{gameObject.name} took {amount} damage. {Current}/{maxHealth}");
 
         if (Current <= 0f)
         {
